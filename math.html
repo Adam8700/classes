@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Tracker</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Math Tracker</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="database.html">Database</a></li>
+            <li><a href="php.html">PHP</a></li>
+            <li><a href="coop.html">CO-OP</a></li>
+            <li><a href="python.html">Python</a></li>
+            <li><a href="math.html">Math</a></li>
+            <li><a href="java.html">Java</a></li>
+            <li><a href="CssClass.html">CSS Class</a></li>
+        </ul>
+    </nav>
+    
+    <main>
+        <section id="add-course">
+            <h2>Add Assignment</h2>
+            <form id="course-form">
+                <label for="course_name">Assignment Name:</label>
+                <input type="text" id="course_name" required>
+            
+                <label for="due_date">Due Date:</label>
+                <input type="date" id="due_date" required>
+                
+                <label for="due_time">Due Time:</label>
+                <input type="time" id="due_time" required>
+                
+                <label for="description">Description:</label>
+                <textarea id="description"></textarea>
+                
+                <button type="submit">Add Assignment</button>
+            </form>
+        </section>
+
+        <section id="course-list">
+            <h2>Assignments</h2>
+            <div id="courses">
+                <!-- Assignments will be dynamically generated here -->
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 Adam Latimer</p>
+    </footer>
+    <script src="./js/script.js"></script>
+</body>
+</html>

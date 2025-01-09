@@ -1,0 +1,115 @@
+*** * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    color: #333;
+    text-align: center;
+}
+
+header {
+    background-color: #007BFF;
+    color: white;
+    padding: 1rem;
+}
+
+nav ul {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 1rem;
+    background-color: #0056b3;
+}
+
+nav ul li {
+    margin: 0 10px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    background-color: #007BFF;
+    border-radius: 5px;
+}
+
+nav ul li a:hover {
+    background-color: #0056b3;
+}
+
+main {
+    margin: 1rem auto;
+    padding: 1rem;
+    max-width: 800px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+footer {
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: #007BFF;
+    color: white;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+}
+
+.calendar-day {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    text-align: center;
+}
+
+.calendar-day.due {
+    background-color: #ffcccc;
+}
+
+.tooltip {
+    display: none;
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+    padding: 5px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    z-index: 10;
+}
+
+.calendar-day:hover .tooltip {
+    display: block;
+}
+/* Days of the Week */
+.calendar-days-of-week {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 columns to match calendar grid */
+    text-align: center;
+    font-weight: bold;
+    color: #333;
+    padding: 10px 0;
+    margin-bottom: 10px;
+}
+
+.day-name {
+    padding: 10px;
+    background-color: #f1f1f1;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
