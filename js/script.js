@@ -1,19 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Firebase configuration (replace with your actual config)
-    const firebaseConfig = {
-        apiKey: "AIzaSyAFQZmqYQCbctH2C_wTJ0h8gQHVEJX_FDo",
-        authDomain: "course-tracker-de45b.firebaseapp.com",
-        databaseURL: "https://course-tracker-de45b-default-rtdb.firebaseio.com",
-        projectId: "course-tracker-de45b",
-        storageBucket: "course-tracker-de45b.firebasestorage.app",
-        messagingSenderId: "851018339444",
-        appId: "1:851018339444:web:4d794ecd3a1da3195aed21"
-    };
-
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
     const currentPage = window.location.pathname.split('/').pop().replace('.html', '');
     const calendarContainer = document.getElementById('calendar-container');
     const courseForm = document.getElementById('course-form');
@@ -24,26 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentDate = new Date();
 
-    // Save assignment to Firebase
-    const saveAssignment = (assignment) => {
-        db.ref(`assignments/${assignment.class}`).push(assignment);
-    };
+    // Load assignments from localStorage
+    const loadAssignments = () => JSON.parse(localStorage.getItem('assignments')) || [];
+    const saveAssignments = (assignments) => localStorage.setItem('assignments', JSON.stringify(assignments));
 
-    // Load assignments from Firebase
-    const loadAssignments = (callback) => {
-        db.ref('assignments/').on('value', (snapshot) => {
-            const data = snapshot.val();
-            const assignments = [];
-            for (const classKey in data) {
-                for (const assignmentKey in data[classKey]) {
-                    assignments.push(data[classKey][assignmentKey]);
-                }
-            }
-            callback(assignments);
-        });
-    };
-
-    // Add a new assignment
     const addAssignment = (e) => {
         e.preventDefault();
         const name = document.getElementById('course_name').value.trim();
@@ -56,29 +25,37 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const newAssignment = { name, date, time, description, class: currentPage };
-        saveAssignment(newAssignment);
+        const assignments = loadAssignments();
+        assignments.push({ name, date, time, description, class: currentPage });
+        saveAssignments(assignments);
+
         courseForm.reset();
+        loadClassAssignments();
+        if (currentPage === 'index') updateCalendar(); // Update calendar on index page
     };
 
-    // Load and display assignments for the current class
     const loadClassAssignments = () => {
-        loadAssignments((assignments) => {
-            const filtered = assignments.filter(a => a.class === currentPage);
-            coursesContainer.innerHTML = filtered
-                .map(a => `
-                    <div class="assignment-item">
-                        <h3>${a.name}</h3>
-                        <p><strong>Due:</strong> ${a.date} at ${a.time}</p>
-                        <p>${a.description}</p>
-                        <button class="delete-btn" data-id="${a.date}-${a.time}-${a.name}">Delete</button>
-                    </div>
-                `)
-                .join('');
-        });
+        const assignments = loadAssignments().filter(a => a.class === currentPage);
+        coursesContainer.innerHTML = assignments
+            .map(a => `
+                <div class="assignment-item">
+                    <h3>${a.name}</h3>
+                    <p><strong>Due:</strong> ${a.date} at ${a.time}</p>
+                    <p>${a.description}</p>
+                    <button class="delete-btn" data-id="${a.date}-${a.time}-${a.name}">Delete</button>
+                </div>
+            `)
+            .join('');
     };
 
-    // Generate calendar
+    const deleteAssignment = (id) => {
+        let assignments = loadAssignments();
+        assignments = assignments.filter(a => `${a.date}-${a.time}-${a.name}` !== id);
+        saveAssignments(assignments);
+        loadClassAssignments();
+        updateCalendar();
+    };
+
     const generateCalendar = (assignments, year, month) => {
         const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         const firstDay = new Date(year, month, 1).getDay();
@@ -102,7 +79,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let tooltipContent = '';
             if (dueToday.length > 0) {
-                tooltipContent = dueToday.map(a => `<p><strong>${a.name}</strong> at ${a.time}</p>`).join('');
+                tooltipContent = dueToday
+                    .map(a => `<p><strong>${a.name}</strong> at ${a.time}</p>`)
+                    .join('');
             }
 
             calendarHTML += `
@@ -118,14 +97,11 @@ document.addEventListener('DOMContentLoaded', () => {
         attachTooltipListeners(); // Attach tooltips after rendering
     };
 
-    // Update calendar
     const updateCalendar = () => {
-        loadAssignments((assignments) => {
-            const year = currentDate.getFullYear();
-            const month = currentDate.getMonth();
-            monthYearDisplay.textContent = `${new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currentDate)} ${year}`;
-            generateCalendar(assignments, year, month);
-        });
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        monthYearDisplay.textContent = `${new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currentDate)} ${year}`;
+        generateCalendar(loadAssignments(), year, month);
     };
 
     const attachTooltipListeners = () => {
@@ -156,11 +132,16 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCalendar();
     });
 
-    // Initialize
     if (currentPage === 'index') {
         updateCalendar();
     } else {
         courseForm.addEventListener('submit', addAssignment);
+        coursesContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-btn')) {
+                const assignmentId = e.target.getAttribute('data-id');
+                deleteAssignment(assignmentId);
+            }
+        });
         loadClassAssignments();
     }
 });
